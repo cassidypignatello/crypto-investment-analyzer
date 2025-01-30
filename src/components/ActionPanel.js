@@ -26,7 +26,7 @@ const ActionPanel = ({ tickers, setTickers, fetchCryptoData, errorMessage, setEr
         </div>
       </form>
       {errorMessage && <p className="error">{errorMessage}</p>}
-      <p className="ticker-choice-display">{tickers.join(', ')}</p>
+      <p className="ticker-choice-display">{tickers.length > 0 ? tickers.join(', ') : "Your tickers will appear here..."}</p>
       <button
         className="generate-report-btn"
         onClick={fetchCryptoData}

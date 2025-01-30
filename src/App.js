@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 import ActionPanel from './components/ActionPanel';
+import LoadingPanel from './components/LoadingPanel';
 
 const App = () => {
   const [tickers, setTickers] = useState([]);
@@ -23,6 +24,8 @@ const App = () => {
             setErrorMessage={setErrorMessage}
           />
         )}
+
+        {loading && <LoadingPanel />}
       </main>
       <footer>&copy; Not financial advice, please always do your own research!</footer>
     </>
