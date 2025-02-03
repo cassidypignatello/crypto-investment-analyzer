@@ -1,3 +1,5 @@
+import { currentDate } from "./helper";
+
 const fetchCryptoList = async () => {
   try {
     const response = await fetch('https://api.coingecko.com/api/v3/coins/list');
@@ -28,7 +30,7 @@ export const fetchCryptoData = async (tickers, cryptoList, setCryptoList, setRep
         if (!coin) {
           throw new Error(`No matching ID found for ${ticker}`);
         }
-        const url = `https://api.coingecko.com/api/v3/coins/${coin.id}/history?date=30-01-2025`;
+        const url = `https://api.coingecko.com/api/v3/coins/${coin.id}/history?date=${currentDate}`;
         const options = {
           method: 'GET',
           headers: { accept: 'application/json', 'x-cg-demo-api-key': process.env.REACT_APP_COINGECKO_API_KEY },
