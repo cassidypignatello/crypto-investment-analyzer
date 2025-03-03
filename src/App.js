@@ -7,7 +7,7 @@ import LoadingPanel from './components/LoadingPanel';
 const App = () => {
   const [tickers, setTickers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [report, setReport] = useState('');
+  const [report, setReport] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [cryptoList, setCryptoList] = useState([]);
 

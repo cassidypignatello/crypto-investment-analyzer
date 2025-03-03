@@ -1,4 +1,5 @@
 import { currentDate } from "./helper";
+import OpenAI from 'openai';
 
 const fetchCryptoList = async () => {
   try {
@@ -43,11 +44,39 @@ export const fetchCryptoData = async (tickers, cryptoList, setCryptoList, setRep
       })
     );
 
-    console.log(responses)
-    setReport(JSON.stringify(responses, null, 2));
+    const report = fetchReport(responses)
+    // setReport(report);
   } catch (error) {
     setReport('Error fetching crypto data.');
   } finally {
     setLoading(false);
   }
 };
+
+export const fetchReport = async (data) => {
+  const messages = [
+    { role: 'developer', content: 'You are a financial advisor who specializes in cryptocurrency investment. Write a report of no more than 150 words describing the cryptocurrency\'s performance and advising whether to buy, hold, or sell based on the data passed to you. Do not mention October 2023, and only the coin symbol like ETH or ADA, not Bifrost Bridged ETH.' },
+    {
+      role: 'user',
+      content: data.map(coin => `${coin.name} (${coin.symbol.toUpperCase()}): $${coin.market_data.current_price.usd}`).join("\n"),
+    },
+  ];
+
+
+  try {
+    const openai = new OpenAI({
+      apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+      dangerouslyAllowBrowser: true
+    });
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages,
+      store: true,
+    });
+
+    console.log(response.choices[0].message.content);
+  } catch (error) {
+    console.error('Error: ', error);
+  }
+}
