@@ -11,7 +11,7 @@
   text-align: left;
 }
 
-.output-panel pre {
+.output-panel p {
   white-space: pre-wrap;
   word-wrap: break-word;
   width: 100%;
@@ -20,8 +20,17 @@
   padding: 1em;
   background: #f5f5f5;
   border-radius: 8px;
+  overflow-y: scroll;
 }
 
 .output-panel h2 {
   color: #333;
+}
+
+.output-panel p::-webkit-scrollbar {
+  display: none;
+}
+
+.output-panel p::-moz-scrollbar {
+  display: none;
 }
