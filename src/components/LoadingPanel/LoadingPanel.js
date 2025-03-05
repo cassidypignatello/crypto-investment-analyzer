@@ -4,7 +4,7 @@ const LoadingPanel = () => {
   return (
     <section className="loading-panel">
       <img src={loader} alt="Loading" />
-      <p>Querying CoinGecko API...</p>
+      <p>Querying the oracle...</p>
     </section>
   );
 }

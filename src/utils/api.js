@@ -1,16 +1,19 @@
-import { getPastDates, delay } from "./helper";
-import OpenAI from 'openai';
+import { getPastDates } from "./helper";
+
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? ''
+  : 'http://localhost:3001';
 
 const fetchCryptoList = async () => {
   try {
-    const response = await fetch('https://api.coingecko.com/api/v3/coins/list');
+    const response = await fetch(`${API_BASE_URL}/api/coins/list`);
     if (!response.ok) {
       throw new Error('Failed to fetch crypto list');
     }
-
     return await response.json();
   } catch (error) {
     console.error(error);
+    throw error;
   }
 };
 
@@ -28,17 +31,8 @@ const matchCoinId = (ticker, cryptoList) => {
 };
 
 const fetchHistoricalPrice = async (coinId, date, ticker) => {
-  await delay(1200);
-  const url = `https://api.coingecko.com/api/v3/coins/${coinId}/history?date=${date}`;
-  const options = {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      'x-cg-demo-api-key': process.env.REACT_APP_COINGECKO_API_KEY
-    },
-  };
-
-  const response = await fetch(url, options);
+  const url = `${API_BASE_URL}/api/coins/${coinId}/history?date=${date}`;
+  const response = await fetch(url);
 
   if (response.status === 429) {
     throw new Error('Rate limit reached. Please wait a moment and try again.');
@@ -116,32 +110,23 @@ export const fetchReport = async (data) => {
     return `${coin.name} (${coin.symbol}):\n${priceChanges}`;
   }).join('\n\n');
 
-  const messages = [
-    {
-      role: 'developer',
-      content: `You are a crypto degenerate. Analyze the 3-day price trends and provide your unfiltered and humorous opinions in a report of no more than 150 words describing the cryptocurrencies' performance and advising whether to buy, hold, or sell based on the data. Include relevant percentage changes in your analysis. Your responses should be bold and brash, with a focus on entertaining and informing in equal measure. Your responses should not be taken seriously and should not be considered financial advice.`,
-    },
-    {
-      role: 'user',
-      content: formattedData,
-    },
-  ];
-
   try {
-    const openai = new OpenAI({
-      apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-      dangerouslyAllowBrowser: true
+    const response = await fetch(`${API_BASE_URL}/api/generate-report`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ data: formattedData }),
     });
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages,
-      temperature: 1.1,
-    });
+    if (!response.ok) {
+      throw new Error('Failed to generate report');
+    }
 
-    return response.choices[0].message.content;
+    const result = await response.json();
+    return result.report;
   } catch (error) {
-    console.error('Error: ', error);
+    console.error('Error:', error);
     return 'Error generating report, please refresh and try again.';
   }
-}
+};
