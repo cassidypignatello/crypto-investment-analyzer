@@ -1,4 +1,4 @@
-import { getPastDates } from "./helper";
+import { getPastDates, delay } from "./helper";
 import OpenAI from 'openai';
 
 const fetchCryptoList = async () => {
@@ -26,49 +26,65 @@ export const fetchCryptoData = async (tickers, cryptoList, setCryptoList, setRep
       setCryptoList(cryptoDataList);
     }
 
-    const historicalData = await Promise.all(
-      tickers.map(async (ticker) => {
-        const coin = cryptoDataList.find((coin) => {
-          if (ticker === 'ETH') return coin.id === 'ethereum';
-          if (ticker === 'BTC') return coin.id === 'bitcoin';
-          return coin.symbol.toLowerCase() === ticker.toLowerCase();
-        });
+    const historicalData = [];
 
-        if (!coin) {
-          throw new Error(`No matching ID found for ${ticker}`);
-        }
+    for (const ticker of tickers) {
+      const coin = cryptoDataList.find((coin) => {
+        if (ticker === 'ETH') return coin.id === 'ethereum';
+        if (ticker === 'BTC') return coin.id === 'bitcoin';
+        return coin.symbol.toLowerCase() === ticker.toLowerCase();
+      });
 
-        const priceData = await Promise.all(
-          dates.map(async (date) => {
-            const url = `https://api.coingecko.com/api/v3/coins/${coin.id}/history?date=${date}`;
-            const options = {
-              method: 'GET',
-              headers: { accept: 'application/json', 'x-cg-demo-api-key': process.env.REACT_APP_COINGECKO_API_KEY },
-            };
-            const response = await fetch(url, options);
-            if (!response.ok) {
-              throw new Error(`Error fetching ${ticker} for date ${date}`);
-            }
-            const data = await response.json();
-            return {
-              date,
-              price: data.market_data.current_price.usd
-            };
-          })
-        );
+      if (!coin) {
+        throw new Error(`No matching ID found for ${ticker}`);
+      }
 
-        return {
-          name: coin.name,
-          symbol: coin.symbol.toUpperCase(),
-          prices: priceData
+      const priceData = [];
+
+      for (const date of dates) {
+        await delay(1200);
+
+        const url = `https://api.coingecko.com/api/v3/coins/${coin.id}/history?date=${date}`;
+        const options = {
+          method: 'GET',
+          headers: { accept: 'application/json', 'x-cg-demo-api-key': process.env.REACT_APP_COINGECKO_API_KEY },
         };
-      })
-    );
+
+        try {
+          const response = await fetch(url, options);
+
+          if (response.status === 429) {
+            throw new Error('Rate limit reached. Please wait a moment and try again.');
+          }
+
+          if (!response.ok) {
+            throw new Error(`Error fetching ${ticker} for date ${date}`);
+          }
+
+          const data = await response.json();
+          priceData.push({
+            date,
+            price: data.market_data.current_price.usd
+          });
+        } catch (error) {
+          if (error.message.includes('Rate limit')) {
+            throw error;
+          }
+          console.error(`Error fetching ${ticker} for ${date}:`, error);
+        }
+      }
+
+      historicalData.push({
+        name: coin.name,
+        symbol: coin.symbol.toUpperCase(),
+        prices: priceData
+      });
+    }
 
     const report = await fetchReport(historicalData);
     setReport(report);
   } catch (error) {
-    setReport(`Error fetching crypto data: ${error.message}`);
+    setReport(`Error: ${error.message}`);
   } finally {
     setLoading(false);
   }

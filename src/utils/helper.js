@@ -14,3 +14,5 @@ export const getPastDates = (days) => {
   }
   return dates;
 };
+
+export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
