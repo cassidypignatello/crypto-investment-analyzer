@@ -121,6 +121,7 @@ export const fetchReport = async (data) => {
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages,
+      temperature: 1.1,
     });
 
     return response.choices[0].message.content;
