@@ -15,7 +15,7 @@ const App = () => {
   return (
     <>
       <header>
-        <p>Cassidy's Totally Safe Crypto Predictions</p>
+        <p>Cassidy's Totally Safu Crypto Predictions</p>
       </header>
       <main>
         {!loading && !report && (
