@@ -1,4 +1,4 @@
-import loader from '../images/loader.svg';
+import loader from '../../images/loader.svg';
 
 const LoadingPanel = () => {
   return (

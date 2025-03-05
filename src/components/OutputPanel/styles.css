@@ -1,0 +1,27 @@
+.output-panel {
+  line-height: 1.4em;
+  display: flex;
+  min-height: 350px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 1.5em auto;
+  max-width: 600px;
+  padding: 2em;
+  text-align: left;
+}
+
+.output-panel pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1em;
+  padding: 1em;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.output-panel h2 {
+  color: #333;
+}

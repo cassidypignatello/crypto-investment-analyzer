@@ -44,8 +44,8 @@ export const fetchCryptoData = async (tickers, cryptoList, setCryptoList, setRep
       })
     );
 
-    const report = fetchReport(responses)
-    // setReport(report);
+    const report = await fetchReport(responses);
+    setReport(report);
   } catch (error) {
     setReport('Error fetching crypto data.');
   } finally {
@@ -62,7 +62,6 @@ export const fetchReport = async (data) => {
     },
   ];
 
-
   try {
     const openai = new OpenAI({
       apiKey: process.env.REACT_APP_OPENAI_API_KEY,
@@ -75,8 +74,9 @@ export const fetchReport = async (data) => {
       store: true,
     });
 
-    console.log(response.choices[0].message.content);
+    return response.choices[0].message.content;
   } catch (error) {
     console.error('Error: ', error);
+    return 'Error generating report, please refresh and try again.';
   }
 }

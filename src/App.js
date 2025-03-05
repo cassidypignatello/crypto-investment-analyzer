@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import './App.css';
 import { fetchCryptoData } from './utils/api';
-import ActionPanel from './components/ActionPanel';
-import LoadingPanel from './components/LoadingPanel';
+import ActionPanel from './components/ActionPanel/ActionPanel';
+import LoadingPanel from './components/LoadingPanel/LoadingPanel';
+import OutputPanel from './components/OutputPanel/OutputPanel';
 
 const App = () => {
   const [tickers, setTickers] = useState([]);
@@ -26,8 +27,8 @@ const App = () => {
             setErrorMessage={setErrorMessage}
           />
         )}
-
         {loading && <LoadingPanel />}
+        {report && <OutputPanel report={report} />}
       </main>
       <footer>&copy; Not financial advice, please always do your own research!</footer>
     </>
